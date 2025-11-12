@@ -9,13 +9,15 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ local state
 
   const navigate = useNavigate();
-
-  const { updateUser, setLoading, loading } = useContext(UserContext);
+  const { updateUser } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
     setLoading(true);
     setError("");
 
@@ -26,28 +28,28 @@ const SignIn = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      console.log("Response:", response.data);
 
+      // ✅ Save user + token in context and localStorage
       updateUser({
-        ...response.data.user, 
+        ...response.data.user,
         token: response.data.token,
       });
 
-      navigate("/dashboard");
+      navigate("/dashboard/conditions");
     } catch (err) {
-      console.error("Error during login:", err);
-      setError(err.response?.data?.message || "Login failed");
+      console.error("❌ Login failed:", err);
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center align-middle mt-10 max-w-md mx-auto">
-      <div className="mt-10 p-6 border bg-white text-black rounded-2xl h-100%">
-        <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">Sign In</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <Input
             label="Email"
             type="email"
@@ -67,22 +69,20 @@ const SignIn = () => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#1947a8] w-full p-2 hover:bg-[#638ee8] text-white disabled:opacity-50 rounded-lg"
+            className="bg-[#1947a8] w-full py-2 text-white font-medium rounded-lg hover:bg-[#638ee8] disabled:opacity-50 transition duration-200"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <div className="my-4 text-center">
+        <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link to="/signup" className="text-blue-700">
+          <Link to="/signup" className="text-blue-700 hover:underline">
             Sign Up
           </Link>
         </div>
 
-        {error && (
-          <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-sm text-center mt-3">{error}</p>}
       </div>
     </div>
   );

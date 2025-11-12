@@ -1,18 +1,44 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
-import UserProvider from "./context/UserProvider";
+import DashboardLayout from "./pages/dashboard/DashboardLayout";
+import ConditionList from "./pages/condition/ConditionList";
+import ConditionForm from "./pages/condition/ConditionForm";
+import ConditionView from "./pages/condition/ConditionView";
+import ProtectedRoute from "./routes/ProtectedRoutes";
+import ConceptMapTranslate from "./pages/conceptMap/ConceptMapTranslate";
 
-const App = () => (
-  <UserProvider>
-
-    <BrowserRouter>
+const App = () => {
+  return (
+    <Router>
       <Routes>
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/" element={<SignUp />} />
+        {/* Public routes */}
+        <Route path="/" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<ConditionList />} />
+            <Route path="conditions" element={<ConditionList />} />
+            <Route path="conditions/:id" element={<ConditionView />} />
+
+            {/* ✅ FIXED: Relative route path (no / at start) */}
+            <Route path="translate" element={<ConceptMapTranslate />} />
+
+            <Route
+              path="create/condition"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <ConditionForm />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+        </Route>
       </Routes>
-    </BrowserRouter>
-  </UserProvider>
-);
+    </Router>
+  );
+};
 
 export default App;

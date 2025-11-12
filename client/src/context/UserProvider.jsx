@@ -1,4 +1,4 @@
-// src/context/UserContext.jsx
+// src/context/UserProvider.jsx
 import axios from "axios";
 import { createContext, useState, useEffect } from "react";
 import { API_PATHS, BASE_URL } from "../constants/apiPaths";
@@ -6,67 +6,62 @@ import { API_PATHS, BASE_URL } from "../constants/apiPaths";
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);      // user info
-  const [token, setToken] = useState(null);    // auth token
-  const [loading, setLoading] = useState(false); // auth loading
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true); // ✅ true until initialized
 
-  // Restore token from localStorage on initial load
+  // ✅ Load from localStorage on app start
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedToken) setToken(storedToken);
+    setLoading(false);
   }, []);
 
-  // Fetch user profile when token changes
+  // ✅ Fetch user profile when token changes
   useEffect(() => {
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    const fetchUser = async () => {
+    if (!token) return;
+    const fetchProfile = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${BASE_URL}${API_PATHS.AUTH.PROFILE}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await axios.get(`${BASE_URL}${API_PATHS.AUTH.PROFILE}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(response.data);
+        setUser(res.data);
       } catch (error) {
-        console.error("Profile fetch failed:", error);
+        console.error("❌ Profile fetch failed:", error);
         clearUser();
       } finally {
         setLoading(false);
       }
     };
-
-    fetchUser();
+    fetchProfile();
   }, [token]);
 
   const updateUser = (userData) => {
+    if (!userData) return;
     setUser(userData);
-    if (userData?.token) {
-      localStorage.setItem("token", userData.token);
-      setToken(userData.token);
+    const newToken = userData.token || localStorage.getItem("token"); // Use new token or existing
+    if (newToken) {
+      setToken(newToken);
+      localStorage.setItem("token", newToken);
     }
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const clearUser = () => {
     setUser(null);
-    localStorage.removeItem("token");
     setToken(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (
     <UserContext.Provider
       value={{
         user,
-        setUser,
         token,
-        setToken,
         loading,
         setLoading,
         updateUser,

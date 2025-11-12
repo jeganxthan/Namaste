@@ -2,7 +2,7 @@ export const BASE_URL = "http://localhost:3000";
 
 export const API_PATHS = {
   CONDITIONS: {
-    CREATE: "/fhir/conditions/",
+    CREATE: "/fhir/conditions",
     DELETE: (id) => `/fhir/conditions/${id}`,
     GET_ALL: "/fhir/conditions/",
     GET_BY_ID: (id) => `/fhir/conditions/${id}`,
