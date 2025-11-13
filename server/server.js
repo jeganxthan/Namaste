@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.use("/fhir/conditions", conditionsRoutes);
 app.use("/fhir/ConceptMap", conceptMapRoutes);
 app.use("/api/auth", authRoutes);
