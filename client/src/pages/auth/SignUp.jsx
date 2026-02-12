@@ -47,7 +47,7 @@ const SignUp = () => {
       console.log("✅ Signup response:", response.data);
 
       updateUser(response.data);
-      navigate(`/conditions`);
+      navigate("/dashboard/conditions");
     } catch (err) {
       console.error("❌ Signup failed:", err);
       setError(

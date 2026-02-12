@@ -53,7 +53,7 @@ const ConditionDetails = () => {
       </p>
 
       <Link
-        to="/conditions"
+        to="/dashboard/conditions"
         className="block text-center mt-6 text-blue-600 hover:underline"
       >
         ← Back to Conditions

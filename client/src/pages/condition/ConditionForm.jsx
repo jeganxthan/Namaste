@@ -91,16 +91,18 @@ const ConditionForm = () => {
       setDrugData(null);
 
       const res = await axios.get(
-        `${BASE_URL}/concept-maps/translate?code=${code}`,
+        `${BASE_URL}${API_PATHS.CONCEPT_MAP.TRANSLATE_BY_CODE(code)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setDrugData(res.data);
     } catch (err) {
-      console.error("Gemini Fetch Error:", err);
-      setDrugData({
-        error: "No medicine information found for this code.",
-      });
+      console.error("OpenRouter Fetch Error:", err);
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "No medicine information found for this code.";
+      setDrugData({ error: msg });
     } finally {
       setDrugLoading(false);
     }

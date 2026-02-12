@@ -30,10 +30,7 @@ const SignIn = () => {
 
 
       // ✅ Save user + token in context and localStorage
-      updateUser({
-        ...response.data.user,
-        token: response.data.token,
-      });
+      updateUser(response.data);
 
       navigate("/dashboard/conditions");
     } catch (err) {
